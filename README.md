@@ -20,6 +20,8 @@ Lisez attentivement les descriptions dans l'interface avant de cliquer.
 ## 🤝 Contribuer
 Les suggestions sont les bienvenues ! N'hésitez pas à ouvrir une "Issue" ou à proposer une modification (Pull Request).
 
+
+
 🛠 Windows Native Optimizer - Carnet de bord technique
 Ce document résume les défis rencontrés lors du développement du script sous PowerShell 5.1 et les solutions implémentées pour garantir stabilité et visibilité.
 
