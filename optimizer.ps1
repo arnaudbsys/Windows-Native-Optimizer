@@ -1,152 +1,138 @@
-# --- Version 1.4 - UTF-8 BOM & Full DISM Tools ---
+# --- Windows Native Optimizer v4.1 - Version Complète & Stable ---
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     exit
 }
 
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
-# --- Fenêtre ---
 $form = New-Object System.Windows.Forms.Form
-$form.Text = "Windows Native Optimizer & Cleaner v1.4"
-$form.Size = New-Object System.Drawing.Size(900, 1000) 
-$form.StartPosition = "CenterScreen"
+$form.Text = "Windows Native Optimizer v4.1"
+$form.Size = New-Object System.Drawing.Size(900, 980)
 $form.BackColor = [System.Drawing.Color]::FromArgb(25, 25, 25)
 $form.ForeColor = [System.Drawing.Color]::White
 $form.FormBorderStyle = "FixedSingle"
+$form.StartPosition = "CenterScreen"
 
-$fontTitle = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
-$fontText = New-Object System.Drawing.Font("Segoe UI", 9)
-$fontConsole = New-Object System.Drawing.Font("Consolas", 8)
+$fTitle = New-Object System.Drawing.Font("Segoe UI", 11, [System.Drawing.FontStyle]::Bold)
+$fText = New-Object System.Drawing.Font("Segoe UI", 9)
 
-# --- Zone de Logs ---
+# Zone de Logs Améliorée
 $txtLogs = New-Object System.Windows.Forms.TextBox
-$txtLogs.Multiline = $true
-$txtLogs.Location = New-Object System.Drawing.Point(30, 810) 
-$txtLogs.Size = New-Object System.Drawing.Size(820, 110)
-$txtLogs.BackColor = [System.Drawing.Color]::Black
-$txtLogs.ForeColor = [System.Drawing.Color]::LimeGreen
-$txtLogs.ReadOnly = $true
-$txtLogs.ScrollBars = "Vertical"
-$txtLogs.Font = $fontConsole
+$txtLogs.Multiline = $true; $txtLogs.Location = New-Object System.Drawing.Point(30, 800); $txtLogs.Size = New-Object System.Drawing.Size(820, 120)
+$txtLogs.BackColor = [System.Drawing.Color]::Black; $txtLogs.ForeColor = [System.Drawing.Color]::LimeGreen
+$txtLogs.ReadOnly = $true; $txtLogs.ScrollBars = "Vertical"; $txtLogs.Font = New-Object System.Drawing.Font("Consolas", 9)
 $form.Controls.Add($txtLogs)
 
-function Write-Log($msg) {
-    $timestamp = Get-Date -Format "HH:mm:ss"
-    $txtLogs.AppendText("[$timestamp] $msg`r`n")
+function Write-Log($m, $color = "LimeGreen") { 
+    $t = Get-Date -Format "HH:mm:ss"
+    $txtLogs.AppendText("[$t] $m`r`n")
     $txtLogs.SelectionStart = $txtLogs.Text.Length
     $txtLogs.ScrollToCaret()
 }
 
-$progressBar = New-Object System.Windows.Forms.ProgressBar
-$progressBar.Location = New-Object System.Drawing.Point(30, 930)
-$progressBar.Size = New-Object System.Drawing.Size(820, 10)
-$form.Controls.Add($progressBar)
+# --- 1. CONFIDENTIALITE & PERF ---
+$l1 = New-Object System.Windows.Forms.Label
+$l1.Text = "1. CONFIDENTIALITE ET PERFORMANCE"; $l1.Location = New-Object System.Drawing.Point(30, 20); $l1.AutoSize = $true; $l1.Font = $fTitle; $form.Controls.Add($l1)
 
-# --- Fonctions Boutons ---
-function Create-Btn($text, $x, $y, $w, $h, $color, $action) {
-    $btn = New-Object System.Windows.Forms.Button
-    $btn.Text = $text
-    $btn.Location = New-Object System.Drawing.Point($x, $y)
-    $btn.Size = New-Object System.Drawing.Size($w, $h)
-    $btn.FlatStyle = "Flat"
-    $btn.FlatAppearance.BorderSize = 0
-    $btn.BackColor = $color
-    $btn.Add_Click({
-        $progressBar.Value = 30
-        Write-Log "Lancement : $text..."
-        &$action
-        $progressBar.Value = 100
-        Write-Log "Terminé : $text."
-        Start-Sleep -Milliseconds 300
-        $progressBar.Value = 0
-    })
-    $form.Controls.Add($btn)
-}
+$b1 = New-Object System.Windows.Forms.Button
+$b1.Text = "Optimiser le Systeme"; $b1.Location = New-Object System.Drawing.Point(30, 60); $b1.Size = New-Object System.Drawing.Size(250, 35); $b1.FlatStyle = "Flat"; $b1.BackColor = [System.Drawing.Color]::DarkSlateGray
+$b1.Add_Click({ 
+    Write-Log "Optimisation : Telemetrie, Localisation et Animations..."
+    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path "HKCU:\Control Panel\Desktop\WindowMetrics" -Name "MinAnimate" -Value 0 -ErrorAction SilentlyContinue
+    Write-Log "Optimisation terminee."
+})
+$form.Controls.Add($b1)
 
-function Add-Label($text, $x, $y, $font, $color = "White") {
-    $l = New-Object System.Windows.Forms.Label
-    $l.Text = $text
-    $l.Location = New-Object System.Drawing.Point($x, $y)
-    $l.AutoSize = $true
-    $l.Font = $font
-    $l.ForeColor = $color
-    $form.Controls.Add($l)
-}
+$bMouse = New-Object System.Windows.Forms.Button
+$bMouse.Text = "Fix Souris (Precision)"; $bMouse.Location = New-Object System.Drawing.Point(30, 105); $bMouse.Size = New-Object System.Drawing.Size(250, 35); $bMouse.FlatStyle = "Flat"; $bMouse.BackColor = [System.Drawing.Color]::DarkSlateGray
+$bMouse.Add_Click({ 
+    Set-ItemProperty -Path "HKCU:\Control Panel\Mouse" -Name "MouseSpeed" -Value 0
+    Write-Log "Acceleration souris desactivee (plus de precision)."
+})
+$form.Controls.Add($bMouse)
 
-# --- CONTENU ---
+# --- 2. NETTOYAGE ---
+$l2 = New-Object System.Windows.Forms.Label
+$l2.Text = "2. MAINTENANCE ET NETTOYAGE"; $l2.Location = New-Object System.Drawing.Point(30, 170); $l2.AutoSize = $true; $l2.Font = $fTitle; $form.Controls.Add($l2)
 
-# 1. PRIVACY
-Add-Label "1. CONFIDENTIALITÉ & PERFORMANCE" 30 20 $fontTitle
-Create-Btn "Optimiser Système" 30 60 250 35 "DarkSlateGray" {
-    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0
-    Set-ItemProperty -Path "HKCU:\Control Panel\Desktop\WindowMetrics" -Name "MinAnimate" -Value 0
-    Write-Log "Télémétrie et animations optimisées."
-}
-Add-Label "Désactive la télémétrie et les animations de fenêtres." 300 68 $fontText
-
-# 2. NETTOYAGE
-Add-Label "2. MAINTENANCE & NETTOYAGE" 30 130 $fontTitle
-Create-Btn "Nettoyage Fichiers Temp" 30 170 250 35 "SteelBlue" {
+$b2 = New-Object System.Windows.Forms.Button
+$b2.Text = "Nettoyage Profond"; $b2.Location = New-Object System.Drawing.Point(30, 210); $b2.Size = New-Object System.Drawing.Size(250, 35); $b2.FlatStyle = "Flat"; $b2.BackColor = [System.Drawing.Color]::SteelBlue
+$b2.Add_Click({ 
+    Write-Log "Vidage Corbeille et dossiers TEMP..."
     Remove-Item "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
     Clear-RecycleBin -Force -ErrorAction SilentlyContinue
-    Write-Log "Dossiers temporaires et corbeille nettoyés."
-}
-Add-Label "Supprime les fichiers temporaires et vide la corbeille." 300 178 $fontText
+    Write-Log "Nettoyage fichiers temporaires fini."
+})
+$form.Controls.Add($b2)
 
-Create-Btn "Nettoyage Composants (WinSxS)" 30 215 250 35 "SteelBlue" {
-    Write-Log "Nettoyage du magasin des composants (DISM StartComponentCleanup)..."
-    dism /online /cleanup-image /startcomponentcleanup /resetbase
-}
-Add-Label "Réduit la taille du dossier Windows en supprimant les vieilles MAJ." 300 223 $fontText
+$bWinSxS = New-Object System.Windows.Forms.Button
+$bWinSxS.Text = "Nettoyage WinSxS"; $bWinSxS.Location = New-Object System.Drawing.Point(30, 255); $bWinSxS.Size = New-Object System.Drawing.Size(250, 35); $bWinSxS.FlatStyle = "Flat"; $bWinSxS.BackColor = [System.Drawing.Color]::SteelBlue
+$bWinSxS.Add_Click({ 
+    Write-Log "Lancement nettoyage des composants (WinSxS)..."
+    Start-Process powershell -ArgumentList "-Command dism /online /cleanup-image /startcomponentcleanup /resetbase" -Wait
+    Write-Log "Dossier WinSxS optimise."
+})
+$form.Controls.Add($bWinSxS)
 
-# 3. RÉPARATIONS DISM / SFC
-Add-Label "3. RÉPARATIONS SYSTÈME (DISM / SFC)" 30 290 $fontTitle
+# --- 3. REPARATIONS AVEC RAPPORT ---
+$l3 = New-Object System.Windows.Forms.Label
+$l3.Text = "3. REPARATIONS AVANCÉES"; $l3.Location = New-Object System.Drawing.Point(30, 320); $l3.AutoSize = $true; $l3.Font = $fTitle; $form.Controls.Add($l3)
 
-Create-Btn "DISM CheckHealth" 30 330 250 35 "Firebrick" {
-    dism /online /cleanup-image /checkhealth
-    Write-Log "Vérification de l'état de santé effectuée."
-}
-Add-Label "Vérifie si une corruption est détectée dans l'image système." 300 338 $fontText
+$b3 = New-Object System.Windows.Forms.Button
+$b3.Text = "DISM RestoreHealth"; $b3.Location = New-Object System.Drawing.Point(30, 360); $b3.Size = New-Object System.Drawing.Size(250, 35); $b3.FlatStyle = "Flat"; $b3.BackColor = [System.Drawing.Color]::Firebrick
+$b3.Add_Click({ 
+    Write-Log "DISM : Verification de l'image systeme..."
+    $res = Start-Process powershell -ArgumentList "-Command dism /online /cleanup-image /restorehealth" -Wait -PassThru
+    if ($res.ExitCode -eq 0) { Write-Log "RAPPORT DISM : Reparation reussie ou aucune erreur." } else { Write-Log "RAPPORT DISM : Echec (Code $($res.ExitCode))." }
+})
+$form.Controls.Add($b3)
 
-Create-Btn "DISM ScanHealth" 30 375 250 35 "Firebrick" {
-    Write-Log "Scan approfondi lancé (ScanHealth). Veuillez patienter..."
-    dism /online /cleanup-image /scanhealth
-}
-Add-Label "Analyse complète pour détecter les corruptions masquées." 300 383 $fontText
+$b4 = New-Object System.Windows.Forms.Button
+$b4.Text = "SFC Scannow"; $b4.Location = New-Object System.Drawing.Point(30, 405); $b4.Size = New-Object System.Drawing.Size(250, 35); $b4.FlatStyle = "Flat"; $b4.BackColor = [System.Drawing.Color]::Brown
+$b4.Add_Click({ 
+    Write-Log "SFC : Analyse des fichiers systeme..."
+    $res = Start-Process powershell -ArgumentList "-Command sfc /scannow" -Wait -PassThru
+    if ($res.ExitCode -eq 0) { Write-Log "RAPPORT SFC : Fichiers sains ou repares." } else { Write-Log "RAPPORT SFC : Erreurs detectees." }
+})
+$form.Controls.Add($b4)
 
-Create-Btn "DISM RestoreHealth" 30 420 250 35 "Firebrick" {
-    Write-Log "Réparation de l'image (RestoreHealth)... Connexion Internet requise."
-    dism /online /cleanup-image /restorehealth
-}
-Add-Label "Répare l'image système via Windows Update." 300 428 $fontText "Orange"
+# --- 4. OPTIONS AVANCEES ---
+$l4 = New-Object System.Windows.Forms.Label
+$l4.Text = "4. OPTIONS AVANCEES"; $l4.Location = New-Object System.Drawing.Point(30, 480); $l4.AutoSize = $true; $l4.Font = $fTitle; $form.Controls.Add($l4)
 
-Create-Btn "SFC Scannow" 30 465 250 35 "Brown" {
-    Write-Log "Analyse SFC lancée..."
-    sfc /scannow
-}
-Add-Label "Répare les fichiers système corrompus sur le disque local." 300 473 $fontText
+$bWinget = New-Object System.Windows.Forms.Button
+$bWinget.Text = "MAJ Logiciels (Winget)"; $bWinget.Location = New-Object System.Drawing.Point(30, 520); $bWinget.Size = New-Object System.Drawing.Size(250, 35); $bWinget.FlatStyle = "Flat"; $bWinget.BackColor = [System.Drawing.Color]::DodgerBlue
+$bWinget.Add_Click({ 
+    Write-Log "Recherche de mises a jour via Winget..."
+    Start-Process powershell -ArgumentList "-Command winget upgrade --all --silent --accept-package-agreements" -Wait
+    Write-Log "Applications a jour."
+})
+$form.Controls.Add($bWinget)
 
-# 4. OPTIONS AVANCÉES
-Add-Label "4. OPTIONS AVANCÉES" 30 550 $fontTitle
-Create-Btn "Mise à jour Winget" 30 590 250 35 "DodgerBlue" {
-    Write-Log "Mise à jour des applications en cours..."
-    winget upgrade --all --silent --accept-package-agreements
-}
-Add-Label "Met à jour nativement tous vos logiciels installés." 300 598 $fontText
+$bBit = New-Object System.Windows.Forms.Button
+$bBit.Text = "Desactiver BitLocker"; $bBit.Location = New-Object System.Drawing.Point(30, 565); $bBit.Size = New-Object System.Drawing.Size(250, 35); $bBit.FlatStyle = "Flat"; $bBit.BackColor = [System.Drawing.Color]::DarkRed
+$bBit.Add_Click({ 
+    Disable-BitLocker -MountPoint "C:"
+    Write-Log "Dechiffrement BitLocker lance sur C:."
+})
+$form.Controls.Add($bBit)
 
-Create-Btn "Désactiver BitLocker" 30 635 250 35 "DarkRed" {
-    $confirm = [System.Windows.Forms.MessageBox]::Show("Voulez-vous désactiver BitLocker ?", "Confirmation", "YesNo")
-    if($confirm -eq "Yes") { Disable-BitLocker -MountPoint "C:" }
-}
-Add-Label "ATTENTION : Supprime la protection par chiffrement du disque." 300 643 $fontText "Orange"
+# --- 5. RACCOURCIS ---
+$l5 = New-Object System.Windows.Forms.Label
+$l5.Text = "5. RACCOURCIS"; $l5.Location = New-Object System.Drawing.Point(30, 640); $l5.AutoSize = $true; $l5.Font = $fTitle; $form.Controls.Add($l5)
 
-# 5. RACCOURCIS
-Add-Label "5. RACCOURCIS UTILES" 30 710 $fontTitle
-Create-Btn "Démarrage" 30 750 135 35 "DimGray" { start "ms-settings:startupapps" }
-Create-Btn "Optimiser Lecteurs" 175 750 135 35 "DimGray" { start "dfrgui.exe" }
+$bS1 = New-Object System.Windows.Forms.Button
+$bS1.Text = "Demarrage"; $bS1.Location = New-Object System.Drawing.Point(30, 680); $bS1.Size = New-Object System.Drawing.Size(120, 35); $bS1.FlatStyle = "Flat"; $bS1.BackColor = [System.Drawing.Color]::DimGray
+$bS1.Add_Click({ start "ms-settings:startupapps" })
+$form.Controls.Add($bS1)
 
-Write-Log "Prêt. Enregistré en UTF-8 BOM pour supporter les accents."
+$bS2 = New-Object System.Windows.Forms.Button
+$bS2.Text = "Lecteurs"; $bS2.Location = New-Object System.Drawing.Point(160, 680); $bS2.Size = New-Object System.Drawing.Size(120, 35); $bS2.FlatStyle = "Flat"; $bS2.BackColor = [System.Drawing.Color]::DimGray
+$bS2.Add_Click({ start "dfrgui.exe" })
+$form.Controls.Add($bS2)
+
+Write-Log "Pret. Version 4.1 stable avec Rapports de sante."
 $form.ShowDialog()
